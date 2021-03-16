@@ -1,0 +1,410 @@
+Aux Lib -- Internal only aux functions, not available to script
+=======
+
+func (ls *LState) CheckAny(n int) LValue 
+func (ls *LState) CheckInt(n int) int
+func (ls *LState) CheckInt64(n int) int64
+func (ls *LState) CheckNumber(n int) LNumber 
+func (ls *LState) CheckString(n int) string 
+func (ls *LState) CheckBool(n int) bool
+func (ls *LState) CheckTable(n int) *LTable 
+func (ls *LState) CheckProc(n int) *LProc 
+func (ls *LState) CheckUserData(n int) *LUserData 
+func (ls *LState) CheckThread(n int) *LState 
+func (ls *LState) CheckType(n int, typ LValueType)
+func (ls *LState) CheckTypes(n int, typs ...LValueType)
+func (ls *LState) CheckOption(n int, options []string) int 
+func (ls *LState) OptInt(n int, d int) int 
+func (ls *LState) OptInt64(n int, d int64) int64
+func (ls *LState) OptNumber(n int, d LNumber) LNumber
+func (ls *LState) OptString(n int, d string) string 
+func (ls *LState) OptBool(n int, d bool) bool 
+func (ls *LState) OptTable(n int, d *LTable) *LTable 
+func (ls *LState) OptProc(n int, d *LProc) *LProc 
+func (ls *LState) OptUserData(n int, d *LUserData) *LUserData
+func (ls *LState) ArgError(n int, message string) 
+func (ls *LState) TypeError(n int, typ LValueType) 
+func (ls *LState) Where(level int) string 
+func (ls *LState) FindTable(obj *LTable, n string, size int) LValue 
+func (ls *LState) RegisterModule(name string, funcs map[string]LGProc) LValue 
+func (ls *LState) SetFuncs(tb *LTable, funcs map[string]LGProc, upvalues ...LValue) *LTable 
+func (ls *LState) NewTypeMetatable(typ string) *LTable 
+func (ls *LState) GetMetaField(obj LValue, event string) LValue 
+func (ls *LState) GetTypeMetatable(typ string) LValue 
+func (ls *LState) CallMeta(obj LValue, event string) LValue 
+func (ls *LState) LoadFile(path string) (*LProc, error) 
+func (ls *LState) LoadString(source string) (*LProc, error) 
+func (ls *LState) DoFile(path string) error
+func (ls *LState) DoString(source string) error
+func (ls *LState) ToStringMeta(lv LValue) LValue 
+func (ls *LState) PreloadModule(name string, loader LGProc) 
+func (ls *LState) CheckChannel(n int) chan LValue 
+func (ls *LState) OptChannel(n int, ch chan LValue) chan LValue 
+
+Chan Lib  -- may be byond requirements at this time
+========
+
+make 
+select 
+  
+receive 
+send 
+close 
+
+Co-Rtn Lib  -- may be beyond requirements at this time
+==========
+
+create
+yield
+resume
+running
+status
+wrap
+
+Load Lib   -- may be beyond requirements at this time
+========
+
+loadlib
+seeall
+
+
+Function list for help
+======================
+
+  Base Lib   (basic functions, library name not required to call)
+	assert
+	collectgarbage
+	run
+	error
+	getfenv
+	getmetatable
+	load
+	loadfile
+	loadstring
+	log
+	logd
+	loge
+	logi
+	logw
+	next
+	pcall
+	put
+	rawequal
+	rawget
+	rawset
+	select
+	_printregs
+	setfenv
+	setmetatable
+	tonumber
+	tostring
+	type
+	unpack
+	xpcall
+	module
+	require
+
+  Dbg Lib     (library name not required to call)
+	getfenv
+	getinfo
+	getlocal
+	getmetatable
+	getupvalue
+	setfenv
+	setlocal
+	setmetatable
+	setupvalue
+	traceback
+
+  IO Lib      (lib name=io)
+	close
+	flush
+	lines
+	input
+	output
+	open
+	popen
+	read
+	type
+	tmpfile
+	write
+	
+  Math Lib     (lib name=math)
+	abs
+	acos
+	asin
+	atan
+	atan2
+	ceil
+	cos
+	cosh
+	deg
+	exp
+	floor
+	fmod
+	frexp
+	ldexp
+	log
+	log10
+	max
+	min
+	mod
+	modf
+	pow
+	rad
+	random
+	randomseed
+	sin
+	sinh
+	sqrt
+	tan
+	tanh
+  
+  OS Lib       (lib name=os)
+	chdir
+	clearenv
+	clock
+	difftime
+	execute
+	exit
+	date
+	getenv
+	geteuid
+	getpid
+	getppid
+	getuid
+	getwd
+	hostname
+	remove
+	rename
+	setenv
+	setlocale
+	time
+	tmpname
+	unsetenv
+
+  String Lib    (lib name=string)
+	byte
+	char
+	contains
+	containsany
+	count
+	dump
+	find
+	format
+	gsub
+	hasprefix
+	hassuffix
+	index
+	indexany
+	lastindex
+	lastindexany
+	len
+	lower
+	match
+	rep
+	replace
+	reverse
+	sub
+	trim
+	trimleft
+	trimprefix
+	trimright
+	trimspace
+	trimsuffix
+	title
+	upper
+  
+  Table Lib
+	getn
+	concat
+	insert
+	maxn
+	remove
+	sort
+
+
+
+
+All Functions (Sorted)
+======================
+
+_printregs
+abs
+acos
+after
+asin
+assert
+atan
+atan2
+before
+bye
+byte
+ceil
+char
+chdir
+clearenv
+clock
+close
+collectgarbage
+concat
+consulavailable
+consulcheckerror
+consulcheckkey
+consuldeletekeys
+consulgetkey
+consulgetkeys
+consulputkey
+consulsetkeys
+contains
+containsany
+cos
+cosh
+count
+date
+dbggetfenv
+dbggetinfo
+dbggetlocal
+dbggetmetalist
+dbggetupvalue
+dbgsetfenv
+dbgsetlocal
+dbgsetmetalist
+dbgsetupvalue
+dbgtraceback
+deg
+difftime
+dump
+erase
+error
+execute
+exist
+exit
+exp
+fact
+fib
+find
+floor
+flush
+fmod
+format
+frexp
+getenv
+geteuid
+getfenv
+getmetalist
+getn
+getpid
+getppid
+getuid
+getwd
+gsub
+hasprefix
+hassuffix
+help
+hostname
+index
+indexany
+input
+insert
+iotype
+keys
+lastindex
+lastindexany
+ldexp
+len
+length
+lines
+load
+loadfile
+loadstring
+log
+log10
+logd
+loge
+logi
+logw
+lower
+match
+max
+maxn
+mean
+median
+min
+mod
+mode
+modf
+module
+next
+open
+output
+pcall
+popen
+pow
+prxchange
+prxmatch
+put
+quit
+rad
+random
+randomseed
+rawequal
+rawget
+rawset
+read
+remove
+rename
+rep
+replace
+require
+reverse
+rms
+run
+scan
+scanall
+select
+sendmail
+setenv
+setfenv
+setlocale
+setmailhost
+setmetalist
+sin
+sinh
+sleep
+sort
+sqrt
+stat
+statfs
+stddev
+stop
+sub
+substr
+sum
+tan
+tanh
+time
+title
+tmpfile
+tmpname
+tonumber
+tostring
+trim
+trimleft
+trimprefix
+trimright
+trimspace
+trimsuffix
+type
+unpack
+unsetenv
+upper
+uuidgen
+uuidgenfmt
+variance
+write
+xpcall
+
+
+
+

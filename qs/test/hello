@@ -1,0 +1,9 @@
+#!/home/david/gopath/bin/q
+/*
+  Script:   hello.q
+  Language: q -- Q scripting control language.	
+  Note: This is a block style comment.  
+  Output:
+  
+*/
+put("Hello World") 
