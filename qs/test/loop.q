@@ -1,6 +1,6 @@
 /*
   Script:   loop.q
-  Language: q -- ops-agent Q scripting control language.
+  Language: q -- Q scripting control language.
   Purpose:  Measure the time of counting up to ten million by one.
   
   Output:

@@ -1,8 +1,7 @@
 /*
   Script:   consul.q
-  Language: q -- ops-agent Q scripting control language.
+  Language: q -- Q scripting control language.
   Purpose:  Consul key access test
-  Date:     31Aug2017
   Output:
 */
 base = "/ops"

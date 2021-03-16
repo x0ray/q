@@ -757,7 +757,7 @@ Script examples:
 Example 1:
 	/*
 	  Script:   test.q
-	  Language: q -- ops-agent scripting control language.	
+	  Language: q -- scripting control language.	
 	  Note: This is a block style comment.
 	*/
 	

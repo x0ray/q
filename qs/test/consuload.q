@@ -1,8 +1,7 @@
 /*  
   Script:   consuload.q
-  Language: q -- ops-agent Q scripting control language.	
+  Language: q -- Q scripting control language.	
   Purpose:  Consul key load, access, delete test
-  Date:     31Aug2017
   Output:
 						Q script Consul load test.
 

@@ -1,6 +1,6 @@
 /* 
   Script:   filetest.q
-  Language: q -- ops-agent Q scripting control language.	
+  Language: q -- Q scripting control language.	
   Output:
 david@ptnode17:~ > emi-oa filetest.q
 2017-08-22T13:08:31.256748-04:00 INFO  [qslibbase.go:255] [Q] - Program:filetest.q version:0.0.1

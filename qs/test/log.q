@@ -1,6 +1,6 @@
 /* 
   Script:   log.q
-  Language: q -- ops-agent Q scripting control language.	
+  Language: q -- Q scripting control language.	
   Output:
 */
 PGM = "log.q" ;   // PGM is a string variable

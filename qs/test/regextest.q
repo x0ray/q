@@ -1,6 +1,6 @@
 /*
   Script:   regextest.q
-  Language: q -- ops-agent Q scripting control language.
+  Language: q -- Q scripting control language.
   Output:
 2017-09-28T13:51:32.539038-04:00 INFO  [qslibbase.go:432] [Q] - Program:regextest.q version:0.0.1
 Test string:    This is the story of a

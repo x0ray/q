@@ -1,6 +1,6 @@
 /*
   Script:   datagg.q
-  Language: q -- ops-agent Q scripting control language.
+  Language: q -- Q scripting control language.
   Purpose:  Data aggregation demonstration.
   Output:
 

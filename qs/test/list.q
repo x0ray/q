@@ -1,6 +1,6 @@
 /*
   Script:   list.q
-  Language: q -- ops-agent Q scripting control language.
+  Language: q -- Q scripting control language.
   Purpose:  Demonstration of Q scripting list aggregate data structure
   Output:
 */
