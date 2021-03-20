@@ -47,7 +47,7 @@ dbgsetupvalue    debugSetUpvalue
 dbgtraceback     debugTraceback
 deg              mathDeg
 decodeBase64     strDecodeBase64
-deploymentinfo   emiDeploymentInfo
+deploymentinfo   externDeploymentInfo
 difftime         osDiffTime
 dump             strDump
 dumpl            listDump
@@ -118,7 +118,7 @@ mode             mathMode
 modf             mathModf
 module           loModule
 next             baseNext
-notify           emiNotify
+notify           externNotify
 pcall            basePCall
 pow              mathPow
 prxchange        strPrxChange
@@ -143,11 +143,11 @@ run              baseRun
 scan             strScan
 scanall          strScanAll
 select           baseSelect
-sendmail         emiSendMail
+sendmail         externSendMail
 setenv           osSetEnv
 setfenv          baseSetFEnv
 setlocale        osSetLocale
-setmailhost      emiSetMailHost
+setmailhost      externSetMailHost
 setmetalist      baseSetMetalist
 sin              mathSin
 sinh             mathSinh

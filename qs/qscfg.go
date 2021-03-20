@@ -4,6 +4,8 @@ package qs
 import (
 	"os"
 	"runtime"
+
+	"github.com/rs/zerolog/log"
 )
 
 const LNumberBit = 64
@@ -35,13 +37,19 @@ func init() {
 	if QsOS == "linux" || QsOS == "darwin" { // unix-like
 		QsLDir = "/usr/local/share/q"
 		QsPathDefault = "./?.q;" + QsLDir + "/?.q;" + QsLDir + "/?/init.q"
-		lgd("detectedOs", "os", QsOS, "libdir", QsLDir, "path", QsPathDefault)
+		log.Debug().
+			Str("os", QsOS).Str("libdir", QsLDir).Str("path", QsPathDefault).
+			Msg("detected OS")
 	} else if QsOS == "windows" {
 		QsLDir = "!\\q"
 		QsPathDefault = ".\\?.q;" + QsLDir + "\\?.q;" + QsLDir + "\\?\\init.q"
-		lgd("detectedOs", "os", QsOS, "libdir", QsLDir, "path", QsPathDefault)
+		log.Debug().
+			Str("os", QsOS).Str("libdir", QsLDir).Str("path", QsPathDefault).
+			Msg("detected OS")
 	} else {
-		lge("osNotSupported", "os", QsOS)
+		log.Error().
+			Str("os", QsOS).
+			Msg("OS not supported")
 	}
 
 	// seperate Args before -- and after --

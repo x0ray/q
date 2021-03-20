@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 func OpenBase(L *LState) int {
@@ -168,20 +170,20 @@ var baseFuncs = map[string]LGProc{
 	"tan":        mathTan,
 	"tanh":       mathTanh,
 	"variance":   mathVariance,
-	// emi procs
-	"consulavailable":  consulAvailable,
-	"consulcheckerror": consulCheckError,
-	"consulcheckkey":   consulCheckKey,
-	"consuldeletekeys": consulDeleteKeys,
-	"consulgetkey":     consulGetKey,
-	"consulgetkeys":    consulGetKeys,
-	"consulputkey":     consulPutKey,
-	"consulsetkeys":    consulSetKeys,
-	"deploymentinfo":   emiDeploymentInfo,
-	"notify":           emiNotify,
-	"setmailhost":      emiSetMailHost,
-	"sendmail":         emiSendMail,
-	// os procs
+	// special procs
+	// "consulavailable":  consulAvailable,
+	// "consulcheckerror": consulCheckError,
+	// "consulcheckkey":   consulCheckKey,
+	// "consuldeletekeys": consulDeleteKeys,
+	// "consulgetkey":     consulGetKey,
+	// "consulgetkeys":    consulGetKeys,
+	// "consulputkey":     consulPutKey,
+	// "consulsetkeys":    consulSetKeys,
+	// "deploymentinfo":   xDeploymentInfo,
+	// "notify":           xNotify,
+	// "setmailhost":      xSetMailHost,
+	// "sendmail":         xSendMail,
+	// // os procs
 	"argstr":     osArgStr,
 	"arglist":    osArgList,
 	"argopts":    osArgOpts,
@@ -428,7 +430,7 @@ func baseLogInfo(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgi(1, "baseInfo", "msg", s)
+	log.Info().Msg(s)
 	return 0
 }
 
@@ -438,7 +440,7 @@ func baseLogWarning(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgw("baseWarning", "msg", s)
+	log.Warn().Msg(s)
 	return 0
 }
 
@@ -448,7 +450,7 @@ func baseLogError(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lge("baseError", "msg", s)
+	log.Error().Msg(s)
 	return 0
 }
 
@@ -458,7 +460,7 @@ func baseLogDebug(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgd("baseDebug", "msg", s)
+	log.Debug().Msg(s)
 	return 0
 }
 

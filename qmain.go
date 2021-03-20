@@ -11,6 +11,9 @@ import (
 
 	"github.com/x0ray/q/qs"
 	"github.com/x0ray/q/qs/qsp"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -32,7 +35,7 @@ const (
 	LOQUACITY = 2 // LOQUACITY - INFO msg control, 9=most 0=least
 )
 
-var VERDATE string = client.BuildDate
+var VERDATE string = "20Mar2021"
 
 const (
 	nmDebug  = "debug"
@@ -142,18 +145,18 @@ var u struct {
 	debug bool
 
 	// run - not real flag option - indicates run mode
-	// Can be in any style from- emi-oa [run] [-pgm fn] [fn.oa]	  For example:
-	//   emi-oa run test.oa
-	//   emi-oa test.oa
-	//   emi-oa -pgm test.oa
-	//   emi-oa run -pgm test.oa
+	// Can be in any style from- q [run] [-pgm fn] [fn.oa]	  For example:
+	//   q run test.oa
+	//   q test.oa
+	//   q -pgm test.oa
+	//   q run -pgm test.oa
 	run bool
 }
 
 var (
 	flgs    *flag.FlagSet // all command line flags
 	status  int           = RCOK
-	oaArgs  []string      // emi-oa args before -- arg
+	oaArgs  []string      // q args before -- arg
 	scrArgs []string      // script args after -- arg
 
 	// TODO change log writer
@@ -247,7 +250,7 @@ func Main() int {
 			}
 		}
 
-		// parse the emi-oa args
+		// parse the q args
 		if subCmd == "" { // first arg not sub command
 			u.run = true
 			subCmd = "run" // default to run sub command
@@ -255,7 +258,7 @@ func Main() int {
 			// get args
 
 			if !strings.Contains(oaArgs[1], EXTN) && !strings.HasPrefix(oaArgs[1], "-") {
-				// probably a non.oa extension #!/emi-oa script
+				// probably a non.oa extension #!/q script
 				u.pgm = oaArgs[1] // get oa pgm
 				if scrArgFlg {
 					flgs.Parse(oaArgs[2:]) // extract options
@@ -342,22 +345,22 @@ func Main() int {
 
 	if u.v {
 		// Use shared version output:
-		fmt.Println("Program: %s version: %s \n", PGM, VER)
-		if u.verbose {
-			fmt.Printf("\n%s\n", qs.QS_LICENSE)
-		}
+		fmt.Printf("Program: %s version: %s \n", PGM, VER)
 		os.Exit(RCOK)
 	}
 
 	// set up logging
-	ilg(5, PGM, u.debug, u.name, VER, VERDATE, u.log, false, u.q, 0, u.loq)
-	lgd("logStarted", "pgm", PGM, "ver", VER, "verdate", VERDATE)
+	// UNIX Time is faster and smaller than most timestamps
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Debug().
+		Str("pgm", PGM).Str("ver", VER).Str("verdate", VERDATE).
+		Msg("Q log started")
 
 	// is OA program profiling required
 	if len(u.profile) != 0 { // do profiling on OA code?
 		prof, err := os.Create(u.profile)
 		if err != nil {
-			lge("profileOpenError", "error", err)
+			log.Error().Err(err).Msg("profile open error")
 			os.Exit(RCERROR)
 		}
 		pprof.StartCPUProfile(prof)
@@ -368,7 +371,7 @@ func Main() int {
 	defer L.Close()
 	// optionally set memory limit in MB
 	if u.limit > 0 {
-		lgd("setMemLimit", "limit", u.limit)
+		log.Debug().Int("limit", u.limit).Msg("set mem limit")
 		L.SetMx(u.limit)
 	}
 
@@ -380,15 +383,15 @@ func Main() int {
 	if len(u.lib) > 0 {
 		if err := L.DoFile(u.lib); err != nil {
 			status = RCWARN
-			lgw("libraryOpenError", "error", err)
+			log.Warn().Err(err).Msg("library open error")
 		}
 	}
 
 	if u.run {
 		// check program extension type
 		if !strings.Contains(u.pgm, EXTN) {
-			// program with no extension, probably using #!/emi-oa
-			// use the entire command args set minus the emi-oa executable
+			// program with no extension, probably using #!/q
+			// use the entire command args set minus the q executable
 			scrArgs = os.Args[1:]
 		}
 
@@ -408,12 +411,12 @@ func Main() int {
 		if u.syntax || u.icode {
 			file, err := os.Open(u.pgm)
 			if err != nil {
-				lge("oaSrciptOpenError", "pgm", u.pgm, "error", err)
+				log.Error().Err(err).Str("pgm", u.pgm).Msg("Q srcipt open error")
 				return RCERROR
 			}
 			segment, err2 := qsp.Parse(file, u.pgm)
 			if err2 != nil {
-				lge("oaSrciptParseError", "pgm", u.pgm, "error", err2)
+				log.Error().Err(err2).Str("pgm", u.pgm).Msg("Q srcipt parse error")
 				return RCERROR
 			}
 			if u.syntax {
@@ -422,7 +425,7 @@ func Main() int {
 			if u.icode {
 				icode, err3 := qs.Compile(segment, u.pgm)
 				if err3 != nil {
-					lge("oaSrciptCompileError", "pgm", u.pgm, "error", err3)
+					log.Error().Err(err3).Str("pgm", u.pgm).Msg("Q srcipt compile error")
 					return RCERROR
 				}
 				fmt.Println(icode.String())
@@ -430,7 +433,7 @@ func Main() int {
 		}
 		// execute oa script from file
 		if err := L.DoFile(u.pgm); err != nil {
-			lge("oaSrciptExecutionError", "pgm", u.pgm, "error", err)
+			log.Error().Err(err).Str("pgm", u.pgm).Msg("Q srcipt execution error")
 			return RCERROR
 		}
 	}
@@ -438,14 +441,14 @@ func Main() int {
 	// execute string of oa script from -exec str option
 	if len(u.exec) > 0 {
 		if err := L.DoString(u.exec); err != nil {
-			lge("oaStringExecutionError", "error", err)
+			log.Error().Err(err).Msg("Q string execution error")
 			return RCERROR
 		}
 	}
 
 	// use interactive mode
 	if u.inter {
-		// use the entire command args set minus the emi-oa executable
+		// use the entire command args set minus the q executable
 		scrArgs = os.Args[1:]
 		// create environment args list
 		nargs := len(scrArgs)
@@ -471,11 +474,11 @@ func doREPL(L *qs.LState) {
 		if str, err := loadline(reader, L); err == nil {
 			if err := L.DoString(str); err != nil {
 				status = RCWARN
-				lge("oaLoadLineDoStringError", "error", err)
+				log.Error().Err(err).Msg("Q load line do string error")
 			}
 		} else { // error on loadline
 			status = RCWARN
-			lge("oaLoadLineError", "error", err)
+			log.Error().Err(err).Msg("Q load line error")
 			return
 		}
 	}
