@@ -21,14 +21,6 @@ clearenv         osClearenv
 clock            osClock
 collectgarbage   baseCollectGarbage
 concat           listConcat
-consulavailable  consulAvailable
-consulcheckerror consulCheckError
-consulcheckkey   consulCheckKey
-consuldeletekeys consulDeleteKeys
-consulgetkey     consulGetKey
-consulgetkeys    consulGetKeys
-consulputkey     consulPutKey
-consulsetkeys    consulSetKeys
 contains         strContains
 containsany      strContainsAny
 cos              mathCos

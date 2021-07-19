@@ -8,16 +8,22 @@ import (
 	"os"
 	"runtime/pprof"
 	"strings"
+	"time"
 
+	"github.com/x0ray/q/logwriter"
 	"github.com/x0ray/q/qs"
 	"github.com/x0ray/q/qs/qsp"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 )
 
 const (
-	PGM  = "q"
-	VER  = "2.0.0"
-	NAME = "Q"
-	EXTN = ".q"
+	PGM     = "q"
+	VER     = "2.0.0"
+	VERDATE = "16JUL2021"
+	NAME    = "Q"
+	EXTN    = ".q"
 )
 
 // codes use by os.Exit()
@@ -31,8 +37,6 @@ const (
 
 	LOQUACITY = 2 // LOQUACITY - INFO msg control, 9=most 0=least
 )
-
-var VERDATE string = client.BuildDate
 
 const (
 	nmDebug  = "debug"
@@ -156,19 +160,7 @@ var (
 	oaArgs  []string      // emi-oa args before -- arg
 	scrArgs []string      // script args after -- arg
 
-	// TODO change log writer
-	/*
-		ilg func(int, string, bool, string, string, string, string, bool,
-			bool, int, int) *bytes.Buffer = xl.InitLogWtr
-
-		// alias logging functions
-		lgi func(int, string, ...interface{}) = xl.Lgi // INFO
-		lgw func(string, ...interface{})      = xl.Lgw // WARN
-		lge func(string, ...interface{})      = xl.Lge // ERROR
-		lgf func(string, ...interface{})      = xl.Lgf // FATAL
-		lgd func(string, ...interface{})      = xl.Lgd // DEBUG
-
-	*/
+	log zerolog.Logger
 )
 
 func init() {
@@ -203,6 +195,8 @@ func init() {
 Use ` + PGM + ` -help for more information`)
 	}
 
+	logWriter := logwriter.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}
+	log = zerolog.New(logWriter).With().Caller().Timestamp().Logger()
 }
 
 func Main() int {
@@ -212,6 +206,13 @@ func Main() int {
 		for i, v := range os.Args {
 			fmt.Printf("  [%d] %s\n", i, v)
 		}
+	}
+
+	// set log level
+	if u.debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Trace().Msg("debug set")
+		qs.SetDebug(u.debug)
 	}
 
 	scrArgFlg := false
@@ -342,23 +343,25 @@ func Main() int {
 
 	if u.v {
 		// Use shared version output:
-		fmt.Println("Program: %s version: %s \n", PGM, VER)
-		if u.verbose {
-			fmt.Printf("\n%s\n", qs.QS_LICENSE)
-		}
+		fmt.Printf("Program: %s version: %s \n", PGM, VER)
 		os.Exit(RCOK)
 	}
 
 	// set up logging
-	ilg(5, PGM, u.debug, u.name, VER, VERDATE, u.log, false, u.q, 0, u.loq)
-	lgd("logStarted", "pgm", PGM, "ver", VER, "verdate", VERDATE)
+	// Default level for this example is info, unless debug flag is present
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	// UNIX Time is faster and smaller than most timestamps
+	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMicro
+	// allow a formatted stacktrace
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	// is OA program profiling required
 	if len(u.profile) != 0 { // do profiling on OA code?
 		prof, err := os.Create(u.profile)
 		if err != nil {
-			lge("profileOpenError", "error", err)
-			os.Exit(RCERROR)
+			log.Error().Err(err).
+				Msg("Profile open error")
+			return RCERROR
 		}
 		pprof.StartCPUProfile(prof)
 		defer pprof.StopCPUProfile()
@@ -368,19 +371,20 @@ func Main() int {
 	defer L.Close()
 	// optionally set memory limit in MB
 	if u.limit > 0 {
-		lgd("setMemLimit", "limit", u.limit)
+		log.Debug().Msgf("Set memory limit: %d", u.limit)
 		L.SetMx(u.limit)
 	}
 
 	// display version information if requested or interactive
-	if u.v || u.inter {
+	if u.inter {
 		fmt.Printf("%s, Version - %s, Build Date - %s\n", PGM, VER, VERDATE)
 	}
 
 	if len(u.lib) > 0 {
 		if err := L.DoFile(u.lib); err != nil {
 			status = RCWARN
-			lgw("libraryOpenError", "error", err)
+			log.Warn().Err(err).
+				Msg("Library open error")
 		}
 	}
 
@@ -408,12 +412,14 @@ func Main() int {
 		if u.syntax || u.icode {
 			file, err := os.Open(u.pgm)
 			if err != nil {
-				lge("oaSrciptOpenError", "pgm", u.pgm, "error", err)
+				log.Error().Str("pgm", u.pgm).Err(err).
+					Msgf("Q script open error %v", err)
 				return RCERROR
 			}
 			segment, err2 := qsp.Parse(file, u.pgm)
 			if err2 != nil {
-				lge("oaSrciptParseError", "pgm", u.pgm, "error", err2)
+				log.Error().Str("pgm", u.pgm).Err(err2).
+					Msgf("Q script parse error %v", err2)
 				return RCERROR
 			}
 			if u.syntax {
@@ -422,7 +428,8 @@ func Main() int {
 			if u.icode {
 				icode, err3 := qs.Compile(segment, u.pgm)
 				if err3 != nil {
-					lge("oaSrciptCompileError", "pgm", u.pgm, "error", err3)
+					log.Error().Str("pgm", u.pgm).Err(err3).
+						Msgf("Q script compile error %v", err3)
 					return RCERROR
 				}
 				fmt.Println(icode.String())
@@ -430,7 +437,8 @@ func Main() int {
 		}
 		// execute oa script from file
 		if err := L.DoFile(u.pgm); err != nil {
-			lge("oaSrciptExecutionError", "pgm", u.pgm, "error", err)
+			log.Error().Str("pgm", u.pgm).Err(err).
+				Msgf("Q script execution error %v", err)
 			return RCERROR
 		}
 	}
@@ -438,7 +446,8 @@ func Main() int {
 	// execute string of oa script from -exec str option
 	if len(u.exec) > 0 {
 		if err := L.DoString(u.exec); err != nil {
-			lge("oaStringExecutionError", "error", err)
+			log.Error().Err(err).
+				Msgf("Q language string execution error %v", err)
 			return RCERROR
 		}
 	}
@@ -461,7 +470,7 @@ func Main() int {
 		fmt.Printf("%s interactive mode, enter exit() to exit, or help() for help. \n", PGM)
 		doREPL(L)
 	}
-	return status
+	return RCOK
 }
 
 // do read/eval/print/loop
@@ -471,11 +480,11 @@ func doREPL(L *qs.LState) {
 		if str, err := loadline(reader, L); err == nil {
 			if err := L.DoString(str); err != nil {
 				status = RCWARN
-				lge("oaLoadLineDoStringError", "error", err)
+				log.Error().Err(err).Msg("Load line do string error")
 			}
 		} else { // error on loadline
 			status = RCWARN
-			lge("oaLoadLineError", "error", err)
+			log.Error().Err(err).Msg("Load line error")
 			return
 		}
 	}

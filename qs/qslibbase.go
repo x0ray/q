@@ -168,19 +168,6 @@ var baseFuncs = map[string]LGProc{
 	"tan":        mathTan,
 	"tanh":       mathTanh,
 	"variance":   mathVariance,
-	// emi procs
-	"consulavailable":  consulAvailable,
-	"consulcheckerror": consulCheckError,
-	"consulcheckkey":   consulCheckKey,
-	"consuldeletekeys": consulDeleteKeys,
-	"consulgetkey":     consulGetKey,
-	"consulgetkeys":    consulGetKeys,
-	"consulputkey":     consulPutKey,
-	"consulsetkeys":    consulSetKeys,
-	"deploymentinfo":   emiDeploymentInfo,
-	"notify":           emiNotify,
-	"setmailhost":      emiSetMailHost,
-	"sendmail":         emiSendMail,
 	// os procs
 	"argstr":     osArgStr,
 	"arglist":    osArgList,
@@ -428,7 +415,7 @@ func baseLogInfo(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgi(1, "baseInfo", "msg", s)
+	log.Info().Msgf("%s", s)
 	return 0
 }
 
@@ -438,7 +425,7 @@ func baseLogWarning(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgw("baseWarning", "msg", s)
+	log.Warn().Msgf("%s", s)
 	return 0
 }
 
@@ -448,7 +435,7 @@ func baseLogError(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lge("baseError", "msg", s)
+	log.Error().Msgf("%s", s)
 	return 0
 }
 
@@ -458,7 +445,9 @@ func baseLogDebug(L *LState) int {
 	for i := 1; i <= top; i++ {
 		s = s + L.ToStringMeta(L.Get(i)).String()
 	}
-	lgd("baseDebug", "msg", s)
+	if debug {
+		log.Debug().Msgf("%s", s)
+	}
 	return 0
 }
 

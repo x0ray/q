@@ -4,6 +4,11 @@ package qs
 import (
 	"os"
 	"runtime"
+	"time"
+
+	"github.com/x0ray/q/logwriter"
+
+	"github.com/rs/zerolog"
 )
 
 const LNumberBit = 64
@@ -25,23 +30,33 @@ var (
 	oaArgs           []string // q args before -- arg
 	scrArgs          []string // script args after -- arg
 	QsEmbedded       bool     // used by embedded proc, default is embedded, q sets to false
+
+	log   zerolog.Logger
+	debug bool
 )
 
 func init() {
-	// assert q command not embedded, running in its own process
+	logWriter := logwriter.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}
+	log = zerolog.New(logWriter).With().Caller().Timestamp().Logger()
+
+	// assert q command embedded
 	QsEmbedded = true
 
 	// TODO fix location of QsLDir
 	if QsOS == "linux" || QsOS == "darwin" { // unix-like
 		QsLDir = "/usr/local/share/q"
 		QsPathDefault = "./?.q;" + QsLDir + "/?.q;" + QsLDir + "/?/init.q"
-		lgd("detectedOs", "os", QsOS, "libdir", QsLDir, "path", QsPathDefault)
+		if debug {
+			log.Debug().Msgf("Detected OS %s", QsOS)
+		}
 	} else if QsOS == "windows" {
 		QsLDir = "!\\q"
 		QsPathDefault = ".\\?.q;" + QsLDir + "\\?.q;" + QsLDir + "\\?\\init.q"
-		lgd("detectedOs", "os", QsOS, "libdir", QsLDir, "path", QsPathDefault)
+		if debug {
+			log.Debug().Msgf("Detected OS %s", QsOS)
+		}
 	} else {
-		lge("osNotSupported", "os", QsOS)
+		log.Error().Msgf("OS %s not supported", QsOS)
 	}
 
 	// seperate Args before -- and after --
@@ -57,4 +72,12 @@ func init() {
 			}
 		}
 	}
+}
+
+func GetDebug() bool {
+	return debug
+}
+
+func SetDebug(d bool) {
+	debug = d
 }

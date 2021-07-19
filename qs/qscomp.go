@@ -524,7 +524,7 @@ func compileAssignStmtLeft(context *funcContext, stmt *qsa.AssignStmt) (int, []*
 			acs = append(acs, ac)
 
 		default:
-			lge("leftSideExpressionInvalid", "st", st)
+			log.Error().Msgf("Left side expression [%#v] invalid", st)
 			os.Exit(RCERROR)
 		}
 	}
@@ -1032,12 +1032,13 @@ func compileExpr(context *funcContext, reg int, expr qsa.Expr, ec *expcontext) i
 		}
 		return sused
 	default:
-		lge("exprNotImplemented", "expr", reflect.TypeOf(ex).Elem().Name())
+		e := reflect.TypeOf(ex).Elem().Name()
+		log.Error().Str("expr", e).
+			Msgf("Expression %v not implemented", e)
 		os.Exit(RCERROR)
 	}
 
-	lge("illogic")
-	panic("Expression illogic")
+	log.Fatal().Msg("Q language failure, expression illogic")
 	return sused
 }
 
@@ -1079,7 +1080,7 @@ func constFold(exp qsa.Expr) qsa.Expr {
 			case "^":
 				return &constLValueExpr{Value: LNumber(math.Pow(float64(lvalue), float64(rvalue)))}
 			default:
-				lge("binaryOpInvalid", "op", expr.Operator)
+				log.Error().Msgf("Binary operator %s invalid", expr.Operator)
 			}
 		} else {
 			retexpr := *expr
