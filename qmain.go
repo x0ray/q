@@ -146,18 +146,18 @@ var u struct {
 	debug bool
 
 	// run - not real flag option - indicates run mode
-	// Can be in any style from- emi-oa [run] [-pgm fn] [fn.oa]	  For example:
-	//   emi-oa run test.oa
-	//   emi-oa test.oa
-	//   emi-oa -pgm test.oa
-	//   emi-oa run -pgm test.oa
+	// Can be in any style from- q [run] [-pgm fn] [fn.oa]	  For example:
+	//   q run test.oa
+	//   q test.oa
+	//   q -pgm test.oa
+	//   q run -pgm test.oa
 	run bool
 }
 
 var (
 	flgs    *flag.FlagSet // all command line flags
 	status  int           = RCOK
-	oaArgs  []string      // emi-oa args before -- arg
+	oaArgs  []string      // q args before -- arg
 	scrArgs []string      // script args after -- arg
 
 	log zerolog.Logger
@@ -248,7 +248,7 @@ func Main() int {
 			}
 		}
 
-		// parse the emi-oa args
+		// parse the q args
 		if subCmd == "" { // first arg not sub command
 			u.run = true
 			subCmd = "run" // default to run sub command
@@ -256,7 +256,7 @@ func Main() int {
 			// get args
 
 			if !strings.Contains(oaArgs[1], EXTN) && !strings.HasPrefix(oaArgs[1], "-") {
-				// probably a non.oa extension #!/emi-oa script
+				// probably a non.oa extension #!/q script
 				u.pgm = oaArgs[1] // get oa pgm
 				if scrArgFlg {
 					flgs.Parse(oaArgs[2:]) // extract options
@@ -391,8 +391,8 @@ func Main() int {
 	if u.run {
 		// check program extension type
 		if !strings.Contains(u.pgm, EXTN) {
-			// program with no extension, probably using #!/emi-oa
-			// use the entire command args set minus the emi-oa executable
+			// program with no extension, probably using #!/q
+			// use the entire command args set minus the q executable
 			scrArgs = os.Args[1:]
 		}
 
@@ -454,7 +454,7 @@ func Main() int {
 
 	// use interactive mode
 	if u.inter {
-		// use the entire command args set minus the emi-oa executable
+		// use the entire command args set minus the q executable
 		scrArgs = os.Args[1:]
 		// create environment args list
 		nargs := len(scrArgs)
