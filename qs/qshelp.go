@@ -52,7 +52,7 @@ Commands:
 	
 Use '` + PGM + ` help -verbose' for help additional ` + PGM + ` help topics:	
    * Language syntax
-   * Language built in procs
+   * Language built in functions
    * Script examples
    * Environment variables
    * Return Codes	
@@ -60,7 +60,7 @@ Use '` + PGM + ` help -verbose' for help additional ` + PGM + ` help topics:
 
 // TODO expand help details
 // Following is the main command help blurb
-const HelpTextVerbose = languageSyntax + builtInProcs + scriptExamples + environmentVariables + returnCodes
+const HelpTextVerbose = languageSyntax + builtInFuncs + scriptExamples + environmentVariables + returnCodes
 
 const languageSyntax = `
 Language syntax:
@@ -69,7 +69,7 @@ Language syntax:
 const reservedWords = `
   Reserved words: 
     and break dcl do else elseif end false for if in nil 
-	not or proc repeat return then true until while
+	not or func repeat return then true until while
 	
  `
 
@@ -124,14 +124,14 @@ const variables = `
   Variables: 
     - Variable names can use the following characters: A..Z, a..z, 0..9, and _
     - A variable can be created by initial assignment which will create a globally
-      accessible variable seen by all procs, or a variable can be created using
-      the dcl statement which will make the variable accessible only by the proc 
+      accessible variable seen by all functions, or a variable can be created using
+      the dcl statement which will make the variable accessible only by the function 
       that executed the dcl statement.
 	- Variable types can be:
         string      s = "Hello Zaphod"
         number      n = 42
         struct      a = {1,2,3}  or  b = {e=33,t="time",c=os.clock()}
-        proc        f = os.getenv("PATH")
+        func        f = os.getenv("PATH")
 
   Builtin global variables
 	_VERSION  - vesion of ` + PGM + `
@@ -167,16 +167,16 @@ const controlStructures = `
 	
  `
 
-const builtInProcs = `
-Language built in procs
-  Q script has many procs built in. There are standard procs and auxillary procs. 
-  The standard procs do not need a name space prefix in order to be referenced. 
-  For example using proc bye to exit the script is specified: 
+const builtInFuncs = `
+Language built in functions
+  Q script has many functions built in. There are standard functions and auxillary functions. 
+  The standard functions do not need a name space prefix in order to be referenced. 
+  For example using func bye to exit the script is specified: 
     bye() 
-  However the auxillary IO proc 'open' is specified with a prefix 'i.':
+  However the auxillary IO func 'open' is specified with a prefix 'i.':
 	f = i.open("myfile.txt","r")
 
-  Standard procs 
+  Standard functions 
 	[z:bool =] assert(a:bool,b:str)
 		Asserts 'a' is true and if not issues message 'b' Returns 'a'.
 		
@@ -189,8 +189,8 @@ Language built in procs
 	error(a:str)               
 		Issues error message 'a'.
 	
-	z = getfenv(a:proc) 
-		Returns the current environment into 'z' for the proc 'a'.
+	z = getfenv(a:func) 
+		Returns the current environment into 'z' for the func 'a'.
 		
 	z = getmetalist(a:list)
 		Returns meta info into 'z' for list 'a'.  
@@ -198,16 +198,16 @@ Language built in procs
 	help() 
 		Displays this help text.
 		
-	z = load(a:proc [,b:str])
-		Loads proc 'z', using proc"nil", "bool", "num", "str", "proc", "data", 
+	z = load(a:func [,b:str])
+		Loads func 'z', using func"nil", "bool", "num", "str", "func", "data", 
 		"thread", "list", "chan" 'a' to load multiple segment strings containing 
 		an Q script.
 		
 	z = loadfile(a:str)
-		Loads proc 'z' from a file named 'a' which contains an Q script.
+		Loads func 'z' from a file named 'a' which contains an Q script.
 	
 	z = loadstring(a:str)
-		Loads proc 'z' from a string 'a'.
+		Loads func 'z' from a string 'a'.
 	
 	log(a:str)
 		Writes message string 'a' on the log as an info message.
@@ -227,8 +227,8 @@ Language built in procs
 	i,v = next(a:list,b:*)
 		Get the next index 'i' and value 'v' from the list 'a'.
 	
-	ok,r = pcall(a:proc,b:*,c:*,...)
-		Call proc 'a' with args 'b', 'c', etc. Catch any runtime errors. If no 
+	ok,r = pcall(a:func,b:*,c:*,...)
+		Call func 'a' with args 'b', 'c', etc. Catch any runtime errors. If no 
 		error 'ok' is true. 
 	
 	put(a:str,b:str,...)
@@ -266,15 +266,15 @@ Language built in procs
 		Returns number 'n' converted to a string.
 	
 	t = type(a:*)
-		Returns the type of 'a', one of: "nil", "bool", "num", "str", "proc", 
+		Returns the type of 'a', one of: "nil", "bool", "num", "str", "func", 
 		"data", "thread", "list", "chan".	
 	
 	a[i], ..., a[j] = unpack(a:list[,i:num[,j:num]])
 		Returns a slice if the list 'a' from 'i' to 'j'
 	
-	ok, r = xpcall(a:proc, e:proc)
-		Call proc 'a' catching any runtime errors. If an error occurs 'ok' is 
-		set to false and proc 'e' is called.  
+	ok, r = xpcall(a:func, e:func)
+		Call func 'a' catching any runtime errors. If an error occurs 'ok' is 
+		set to false and func 'e' is called.  
 ` + // TODO Fix help
 	/*
 				module()
@@ -293,7 +293,7 @@ Language built in procs
 			traceback()
 	*/`
 
-  Input and Output procs:     
+  Input and Output functions:     
 	i.close(f)
 		Close file handle 'f'.
 	
@@ -332,7 +332,7 @@ Language built in procs
 	
 	f:close()
 	
-  Mathematics procs:    	
+  Mathematics functions:    	
 	z:num = abs(a:num)
 		Returns the absolute value of 'a' in 'z'.
 	
@@ -458,7 +458,7 @@ Language built in procs
 	z:num = variance(a:num, b:num [,...])
 		Returns the variance of 'a', 'b' etc in 'z'.
 		
-  Operating System procs:  
+  Operating System functions:  
 	z:str = argstr()
 		Returns the arguments passed to the script as a string in 'z'.
 	     
@@ -562,7 +562,7 @@ Language built in procs
 		Un-sets the environment variable name 'a' and returns true in 'z' if successful. 
 	
 
-  String procs:
+  String functions:
 	z:str = after(a:str,b:str)
 		Returns a sub-string of string 'a' in 'z' containing all characters after 
 		substring 'b'. If 'b' is not located 'z' is the empty string. 
@@ -705,43 +705,8 @@ Language built in procs
 	z:str = upper(a:str)
 		Returns in 'z' the string 'a' converted to upper case.
   
-
-  EMI procs:
-	z:bool = consulavailable()
-		Check if Consul is available
 	
-	z:str = consulcheckerror()
-		Get the Consul error message
-	
-	z:bool = consulcheckkey(k:str)
-		Check if Consul key exists
-	
-	z:str = consuldeletekeys(kb:str)
-		Delete Consul keys
-	
-	z:str = consulgetkey(k:str)
-		Get Consul key value
-	
-	z:list = consulgetkeys(kb:str)
-		Get list of Consul key values
-	
-	z:str = consulputkey(k:str,v:str)
-		Set a Consul key value
-	
-	z:str = consulsetkeys(kb:str,ks:list)
-		Set list of Consul key values
-		
-	z:list = deploymentinfo()
-		Create a list containing deployment values		
-		
-	z:str = setmailhost(user:str,pwd:str,c:host)
-		Set mailer credentials
-	
-	z:str = sendmail(from:str,to:str,c:msg)
-		Send an email message	
-				
-	
-  QList procs:
+  QList functions:
 	l.getn()
 	l.concat()
 	l.insert()
@@ -765,34 +730,34 @@ Example 1:
 	
 	PGM = "test.q" ;   // PGM is a string variable
 	VER = "0.0.1" ;     // the semi-colon ';' is optional
-	// The builtin put() proc writes one or more comma 
+	// The builtin put() func writes one or more comma 
 	// seperated values on the stdout file.
 	// The || operator concatenates strings.
 	log("Program:" || PGM || " version:" || VER) ;
 	
-	// get clock time using os library proc
+	// get clock time using os library func
 	st = clock()   // time stamp in seconds for later use
 	
-	// Create a proc (sub-routine / function) 
-	// Procedures must have an associated end statement
+	// Create a func (sub-routine / function) 
+	// Functions must have an associated end statement
 	// Types are not required for variables
-	proc blabla(a,b)
+	func blabla(a,b)
 	  dcl c        // define local variable called c
 	  c = a + b    // add parameters a and b giving c
 	  return c     // return c to the caller
 	end
 	
-	// use the new proc blabla
+	// use the new func blabla
 	pten = blabla(567,9)
 	put("pten: ",pten) 
 	put("blabla: ",blabla(99,86)) 
 	put("The","answer",blabla(38,4))
 	
-	// make a local alias called 'pid' of os library proc
+	// make a local alias called 'pid' of os library func
 	dcl pid = getpid() ;  // declare pid a local variable
 	put("current pid:" || pid) ;
 	
-	// various built in string library procs
+	// various built in string library funcs
 	ss = "this is a story about a man named Jed whose kin folks were bankers!"
 	put(ss)
 	put("String has prefix 'thi'? ",hasprefix(ss,"thi")) 
@@ -841,13 +806,13 @@ Example 1:
 	tr = trimsuffix(rr,"test")
 	put("Trimpsuffix:",tr)
 	
-	// various built in math library procs
+	// various built in math library funcs
 	a = 44 ;
 	b = 6 ;
 	c = a - b ;
 	put("c:",c) ;
 	
-	// a variable can be a proc
+	// a variable can be a func
 	add2 = blabla
 	f = add2(a,b)
 	put("a add2 b:",f)

@@ -1,5 +1,5 @@
 // package qm stand alone command shell for Q language interpreter
-package qm
+package main
 
 import (
 	"bufio"
