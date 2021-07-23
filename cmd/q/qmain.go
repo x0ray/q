@@ -20,8 +20,8 @@ import (
 
 const (
 	PGM     = "q"
-	VER     = "2.0.0"
-	VERDATE = "16JUL2021"
+	VER     = "2.0.1"
+	VERDATE = "21JUL2021"
 	NAME    = "Q"
 	EXTN    = ".q"
 )
@@ -480,11 +480,11 @@ func doREPL(L *qs.LState) {
 		if str, err := loadline(reader, L); err == nil {
 			if err := L.DoString(str); err != nil {
 				status = RCWARN
-				log.Error().Err(err).Msg("Load line do string error")
+				fmt.Printf("%v", err)
 			}
 		} else { // error on loadline
 			status = RCWARN
-			log.Error().Err(err).Msg("Load line error")
+			fmt.Println("Load line error")
 			return
 		}
 	}
